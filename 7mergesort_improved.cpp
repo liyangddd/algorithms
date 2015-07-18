@@ -30,6 +30,7 @@ void Merge(int a[], int begin, int mid, int end) {
 		exchange(a + begin, mid - begin, mid - begin - step);
 	}
 }
+
 void MergeCore(int a[], int left, int right) {
 	if (left < right) {
 		int mid = (left + right) / 2;
@@ -38,6 +39,7 @@ void MergeCore(int a[], int left, int right) {
 		Merge(a, left, mid + 1, right);
 	}
 }
+
 void MergeSort(int a[], int length) {
 	if (a == NULL || length < 1)
 		return;
