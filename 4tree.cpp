@@ -4,6 +4,7 @@
 #include <stack>
 #include <queue>
 
+//二叉搜索树的创建
 SearchTree CreateSearchTree(SearchTree tree) {
 	int tree_element;
 	while (cin >> tree_element) {
@@ -15,6 +16,7 @@ SearchTree CreateSearchTree(SearchTree tree) {
 	return tree;
 }
 
+//二叉树的清空操作
 SearchTree MakeEmptyTree(SearchTree tree) {
 	if (tree != NULL) {
 		MakeEmptyTree(tree->left);
@@ -24,6 +26,35 @@ SearchTree MakeEmptyTree(SearchTree tree) {
 	return NULL;
 }
 
+//二叉树的拷贝
+SearchTree CopyTree(SearchTree tree) {
+	if (NULL == tree)
+		return NULL;
+	SearchTree pleft = CopyTree(tree->left);
+	SearchTree pright = CopyTree(tree->right);
+	tree->left = pleft;
+	tree->right = pright;
+	return tree;
+}
+
+//二叉树的镜像 offerT19
+void MirrorTree(SearchTree tree) {
+	if (NULL == tree)
+		return;
+	if (NULL == tree->left && NULL == tree->right)
+		return;
+
+	SearchTree temp = tree->left;
+	tree->left = tree->right;
+	tree->right = temp;
+
+	if (tree->left)
+		MirrorTree(tree->left);
+	if (tree->right)
+		MirrorTree(tree->right);
+}
+
+//二叉搜索树的查找
 Position FindFromTree(ElementType x, SearchTree tree) {
 	if (tree == NULL)
 		return NULL;
@@ -35,6 +66,7 @@ Position FindFromTree(ElementType x, SearchTree tree) {
 		return tree;
 }
 
+//寻找二叉搜索树的最大节点:递归和非递归
 Position FindMax(SearchTree tree) {
 	if (tree != NULL)
 		while (tree->right != NULL)
@@ -42,7 +74,24 @@ Position FindMax(SearchTree tree) {
 	return tree;
 }
 
+Position FindMax2 (SearchTree tree) {
+	if (tree == NULL)
+		return NULL;
+	else if (tree->right == NULL)
+		return tree;
+	else
+		return FindMax2(tree->right);
+}
+
+//寻找二叉搜索树的最小节点：递归和非递归
 Position FindMin(SearchTree tree) {
+	if (tree != NULL)
+		while (tree->left)
+			tree = tree->left;
+	return tree;
+}
+
+Position FindMin2(SearchTree tree) {
 	if (tree == NULL)
 		return NULL;
 	else if (tree->left == NULL)
@@ -51,6 +100,7 @@ Position FindMin(SearchTree tree) {
 		return FindMin(tree->left);
 }
 
+//二叉搜索树的插入
 SearchTree InsertToTree(ElementType x, SearchTree tree) {
 	if (tree == NULL) {
 		tree = (struct TreeNode*)malloc(sizeof(struct TreeNode));
@@ -70,6 +120,7 @@ SearchTree InsertToTree(ElementType x, SearchTree tree) {
 	return tree;
 }
 
+//二叉搜索树的删除
 SearchTree DeleteFromTree(ElementType x, SearchTree tree) {
 	Position temp;
 	if (tree == NULL) {
@@ -196,10 +247,10 @@ void InOrderTraversal(SearchTree tree) {
 			cur = cur->left;
 		}
 		//if (!stk.empty()) {
-			cur = stk.top();
-			VisitTreeElement(cur);
-			stk.pop();
-			cur = cur->right;
+		cur = stk.top();
+		VisitTreeElement(cur);
+		stk.pop();
+		cur = cur->right;
 		//}
 	}
 }
@@ -288,6 +339,7 @@ void PostOrderTraversal2(SearchTree tree) {
 	}
 }
 
+//后序遍历递归算法
 void PostOrderTraversalRecursion(SearchTree tree) {
 	if (tree == NULL)
 		return;
@@ -296,7 +348,7 @@ void PostOrderTraversalRecursion(SearchTree tree) {
 	VisitTreeElement(tree);
 }
 
-//层次遍历，入队前访问
+//层次遍历，入队前访问或出队前访问均可
 void LevelTraversal(SearchTree tree) {
 	queue<SearchTree> q;
 	VisitTreeElement(tree);
@@ -314,11 +366,142 @@ void LevelTraversal(SearchTree tree) {
 		}
 	}
 }
-#include <queue>
+
 void VisitTreeElement(SearchTree tree) {
 	cout << tree->element << " ";
 }
 
+//offerT25
+//打印二叉树中和为某一值的路径
+void FindPathCore(SearchTree tree, int sum, vector<int>& path, int sum_current);
+void FindPath(SearchTree tree, int sum) {
+	if (NULL == tree)
+		return;
+	
+	vector<int> path;
+	int sum_current = 0;
+	FindPathCore(tree, sum, path, sum_current);
+}
+
+void FindPathCore(SearchTree tree, int sum, vector<int>& path, int sum_current) {
+	sum_current += tree->element;
+	path.push_back(tree->element);
+
+	bool isleef = (tree->left == NULL && tree->right == NULL);
+
+	//当达到叶结点，并且该路径和等于输入整数时，输出这个符合要求的路径
+	if (isleef && sum_current == sum) {
+		cout << "a path: ";
+		vector<int>::iterator iter = path.begin();
+		while (iter != path.end())
+			cout << *iter++ << " ";
+		cout << endl;
+	}
+
+	if (tree->left)
+		FindPathCore(tree->left, sum, path, sum_current);
+	if (tree->right)
+		FindPathCore(tree->right, sum, path, sum_current);
+
+	//当遍历完一条路径后，要从路径中删除该叶结点并从路径和中减去当前叶结点
+	sum_current -= tree->element;
+	path.pop_back();
+}
+
+//offerT27
+//二叉搜素树和双向链表(中序遍历)
+void CovertTreetoListCore(SearchTree tree, SearchTree* last_listnode);
+SearchTree CovertTreetoList(SearchTree tree) {
+	SearchTree last_listnode = NULL;
+	CovertTreetoListCore(tree, &last_listnode);
+	
+	//last_listnode指向双向链表尾部，这里将其指向头部
+	SearchTree head_list = last_listnode;
+	while (head_list && head_list->left != NULL)
+		head_list = head_list->left;
+
+	return head_list;
+}
+
+//函数第二个参数是指针的指针
+void CovertTreetoListCore(SearchTree tree, SearchTree* last_listnode) {
+	if (NULL == tree)
+		return;
+
+	SearchTree current = tree;
+
+	if (current->left)
+		CovertTreetoListCore(current->left, last_listnode);
+
+	current->left = *last_listnode;
+	if (*last_listnode)
+		(*last_listnode)->right = current;
+	
+	*last_listnode = current;
+
+	if (current->right)
+		CovertTreetoListCore(current->right, last_listnode);
+}
+
+//offerT39
+//判断一棵树是不是平衡树（方法一）
+bool IsBalancedTreeCore(SearchTree tree, int *depth);
+bool IsBalancedTree(SearchTree tree) {
+	int depth = 0;
+	return IsBalancedTreeCore(tree, &depth);
+}
+
+bool IsBalancedTreeCore(SearchTree tree, int *depth) {
+	if (NULL == tree) {
+		*depth = 0;
+		return true;
+	}
+
+	int depth_left, depth_right;
+	if (IsBalancedTreeCore(tree->left, &depth_left) && 
+		IsBalancedTreeCore(tree->right, &depth_right)) {
+		int diff = depth_left - depth_right;
+		if (diff >= -1 && diff <= 1) {
+			*depth = (depth_left > depth_right ? depth_left : depth_right) + 1;
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+//offerT39
+//判断一棵树是不是平衡树（方法二）
+//Depth结构用于存储根结点的最大和最小深度
+struct Depth {
+	int min_depth;
+	int max_depth;
+};
+//函数返回根结点的最大和最小深度
+Depth GetDepth(SearchTree tree) {
+	if (NULL == tree) {
+		Depth empty = {0, 0};
+		return empty;
+	}
+
+	Depth lhs = GetDepth(tree->left);
+	Depth rhs = GetDepth(tree->right);
+	Depth depth;
+	depth.max_depth = 1 + max(lhs.max_depth, rhs.max_depth);
+	depth.min_depth = 1 + min(lhs.min_depth, rhs.min_depth);
+	return depth;
+}
+bool IsBalancedTree2(SearchTree tree) {
+	Depth depth = GetDepth(tree);
+	//如果根结点的最大深度和最小深度之差不超过1为平衡二叉树
+	if (depth.max_depth - depth.min_depth > 1)
+		return false;
+	else
+		return true;
+}
+
+//寻找节点后继
 //二叉搜索树按照中序遍历时，输出的节点是从小到大排列好的。
 //如果各个节点关键字不相等，那么节点x的前驱就是中序遍历的
 //x的前一个，后继就是中序遍历的x的后一个节点。
@@ -330,6 +513,8 @@ Position FindSuccessor(Position pos) {
 	return NULL;
 }
 
+//offerT6
+//由先序和中序遍历构造二叉树
 Position ConstructBiTreeCore(int *startPreOrder, int *endPreorder, 
 	                         int *startInorder, int *endInorder) {
 	int root_value = startPreOrder[0];
@@ -340,15 +525,22 @@ Position ConstructBiTreeCore(int *startPreOrder, int *endPreorder,
 	root->right = root->left = NULL;
 
 	if (startPreOrder == endPreorder) {
-		if (startInorder == endInorder && startInorder[0] == startPreOrder[0])
+		if (startInorder == endInorder && *startInorder == *startPreOrder) {
+			cout << root->element << " ";
 			return root;
-		else
-			return NULL;
+		}
+		else { //当输入序列不符合要求时，返回NUll之前释放root，以免内存泄露
+			free(root);
+			throw exception("invalid input");
+		}
 	}
 
 	int *rootInorder = startInorder;
 	while (rootInorder <= endInorder && *rootInorder != root_value)
 		++rootInorder;
+
+	if (rootInorder == endInorder && *rootInorder != root_value)
+		throw exception("invaid input");
 
 	int left_len = rootInorder - startInorder;
 	int *leftPreOrderEnd = startPreOrder + left_len;
@@ -360,28 +552,330 @@ Position ConstructBiTreeCore(int *startPreOrder, int *endPreorder,
 		root->right = ConstructBiTreeCore(leftPreOrderEnd + 1, endPreorder, 
 			rootInorder + 1, endInorder);
 	}
+	cout << root->element << " ";
 	return root;
 }
-//由先序和中序遍历构造二叉树
+
 Position ConstructBiTree(int *preorder, int *inorder, int len) {
 	if (preorder == NULL || inorder == NULL || len <= 0)
 		return NULL;
 	return ConstructBiTreeCore(preorder, preorder + len - 1,
 		inorder, inorder + len - 1);
 }
+
+//根据先序遍历和中序遍历求后序遍历(和上题构造二叉树原理一样)
+void PrintPostOrderCore(int *startPreorder, int *endPreorder,
+	int *startInorder, int *endInorder) {
+	int root_value = startPreorder[0];
+
+	//当先序遍历和后序遍历仅有一个元素且该元素相等时，输出
+	//否则是非法输入
+	if (startPreorder == endPreorder) {
+		if (startInorder == endInorder && *startPreorder == *startInorder) {
+			cout << root_value << " ";
+		}
+		else {
+			throw exception("invalid input");
+		}
+	}
+
+	//在中序遍历中寻找根的位置
+	int *rootInorder = startInorder;
+	while (rootInorder <= endInorder && *rootInorder != root_value)
+		++rootInorder;
+
+	//递归遍历左右子树
+	int left_length = rootInorder - startInorder;
+	int *leftPreorderEnd = startPreorder + left_length;
+	if (left_length > 0)
+		PrintPostOrderCore(startPreorder + 1, leftPreorderEnd,
+		      startInorder, rootInorder - 1);
+	if (left_length < endPreorder - startPreorder)
+		PrintPostOrderCore(leftPreorderEnd + 1, endPreorder,
+		      rootInorder + 1, endInorder);
+	
+	//左右子树输出完成后，在输出根结点值
+	cout << root_value << " ";
+}
+void PrintPostOrder(int *preorder, int *inorder, int length) {
+	if (preorder == NULL || inorder == NULL || length <= 0)
+		return;
+	PrintPostOrderCore(preorder, preorder + length - 1,
+		inorder, inorder + length -1);
+}
+//offerT24
+//判断某个整数数组是不是一个二叉搜索树的后序遍历序列
+bool IsPostOrderBST(int array[], int length) {
+	if (length < 1 || array == NULL)
+		return false;
+
+	int root = array[length - 1];
+
+	int length_left = 0;
+	for ( ; length_left < length - 1; ++length_left) {
+		if (array[length_left] > root)
+			break;
+	}
+
+	int pos_right = length_left;
+	for ( ; pos_right < length - 1; ++pos_right) {
+		if (array[pos_right] < root)
+			return false;
+	}
+
+	//判断左子树是不是BST的后序遍历序列
+	bool result_left = true;
+	if (length_left > 0)
+		result_left = IsPostOrderBST(array, length_left);
+
+	//判断右子树是不是BST的后序遍历序列
+	bool result_right = true;
+	if (length_left < length - 1)
+		result_right = IsPostOrderBST(array + length_left, length - length_left - 1);
+
+	return (result_left && result_right);
+}
+
+//求二叉树中节点个数
+int CountTreeNodesNum(SearchTree tree) {
+	if (NULL == tree)
+		return -1;
+	return CountTreeNodesNum(tree->left) + CountTreeNodesNum(tree->right) + 1;
+}
+
+//求二叉树第k层结点树(根为第1层)
+int GetTreeNodesNumKthLevel(SearchTree tree, int k) {
+	if (NULL == tree || k < 1)
+		return 0;
+	if (1 == k)
+		return 1;
+	int num_left = GetTreeNodesNumKthLevel(tree->left, k - 1);
+	int num_right = GetTreeNodesNumKthLevel(tree->right, k - 1);
+	return num_left + num_right;
+}
+
+//求叶结点个数
+int GetLeafNum(SearchTree tree) {
+	if (NULL == tree)
+		return 0;
+	if (!tree->left && !tree->right)
+		return 1;
+	int leaf_left = GetLeafNum(tree->left);
+	int leaf_right = GetLeafNum(tree->right);
+	return leaf_left + leaf_right;
+}
+
+//求二叉树的深度
+int GetNodeDeepth(SearchTree tree) {
+	if (tree == NULL)
+		return 0;
+	int deepth_left = GetNodeDeepth(tree->left);
+	int deepth_right = GetNodeDeepth(tree->right);
+	return deepth_right > deepth_left ? (deepth_right + 1): (deepth_left + 1);
+}
+
+//求二叉树中结点的最大距离(方法一)
+struct Result {
+	int max_distance;
+	int max_depth;
+};
+
+Result GetMaxDistanceCore(SearchTree tree);
+int GetMaxDistance(SearchTree tree) {
+	return GetMaxDistanceCore(tree).max_distance;
+}
+
+Result GetMaxDistanceCore(SearchTree tree) {
+	if (NULL == tree) {
+		//最大深度初始化为-1是因为调用这对其加1，然后变为0
+		Result empty = {0, -1};
+		return empty;
+	}
+
+	Result lhs = GetMaxDistanceCore(tree->left);
+	Result rhs = GetMaxDistanceCore(tree->right);
+	Result result;
+	result.max_depth = max(lhs.max_depth + 1, rhs.max_depth + 1);
+	result.max_distance = max(max(lhs.max_distance, rhs.max_distance), 
+		                      lhs.max_depth + rhs.max_depth + 2);
+
+	return result;
+}
+
+//求二叉树中结点的最大距离(方法二)
+int GetMaxDistance2(TreeNode * pRoot){
+	if (pRoot == NULL)
+		return 0;
+
+	return max(GetNodeDeepth(pRoot->left) + GetNodeDeepth(pRoot->right), 
+		max(GetMaxDistance2(pRoot->left), GetMaxDistance2(pRoot->right)));
+}
+
+//二叉树A和B，判断A和B是否相等
+bool EqualBinaryTree(SearchTree treea, SearchTree treeb) {
+	if (treea == NULL && treeb == NULL)
+		return true;
+	if ((!treea && treeb) || (treea && !treeb))
+		return false;
+
+	if (treea->element == treeb->element) {
+		return EqualBinaryTree(treea->left, treeb->left) &&
+			EqualBinaryTree(treea->right, treeb->right);
+	}
+	return false;
+} 
+
+//二叉树A和B，判断可以旋转的A和B是否相等,旋转是指左右子树可交换
+bool EqualBinaryTree2(SearchTree treea, SearchTree treeb) {
+	if (treea == NULL && treeb == NULL)
+		return true;
+	if ((!treea && treeb) || (treea && !treeb))
+		return false;
+
+	if (treea->element == treeb->element) {
+		return (EqualBinaryTree2(treea->left, treeb->left) && 
+			EqualBinaryTree2(treea->left, treeb->left)) || 
+			(EqualBinaryTree2(treea->left, treeb->right) && 
+			EqualBinaryTree2(treea->right, treeb->left));
+	}
+	return false;
+}
+
+//offerT18
+//二叉树A和B，判断B是不是A的子结构
+bool SubTreeCore(SearchTree treea, SearchTree treeb) {
+	if (treeb == NULL)
+		return true;
+	if (treea == NULL)
+		return false;
+	if (treea->element != treeb->element)
+		return false;
+	return SubTreeCore(treea->left, treeb->left) &&
+		SubTreeCore(treeb->right, treeb->right);
+}
+
+bool IsSubTree(SearchTree treea, SearchTree treeb) {
+	bool result = false;
+	if (treea && treeb) {
+		if (treea->element == treeb->element)
+			result = SubTreeCore(treea, treeb);
+		if (!result)
+			result = IsSubTree(treea->left, treeb);
+		if (!result)
+			result = IsSubTree(treea->right, treeb);
+	}
+	return result;
+}
+
+//判断二叉树是不是完全二叉树
+bool IsCompletedTree(SearchTree tree) {
+	if (NULL == tree)
+		return false;
+	bool result = true;
+	bool must_leaf = false;
+	
+	queue<SearchTree> nodes;
+	nodes.push(tree);
+	while (!nodes.empty()) {
+		SearchTree node = nodes.front();
+		nodes.pop();
+		
+		//如果某节点只有左子树，那么按照层次遍历时
+		//其后结点必须全为叶子结点，否则该树不是完全二叉树
+		if (must_leaf) {
+			if (node->left || node->right) {
+				result = false;
+				break;
+			}
+		}
+		else {
+			if (node->left && node->right) {
+				nodes.push(node->left);
+				nodes.push(node->right);
+			}
+			else if (node->left && ! node->right) {
+				must_leaf = true;
+				nodes.push(tree->left);
+			}
+			else if (!node->left && node->right) {
+				result = false;
+				break;
+			}
+			else
+				must_leaf = true;
+		}
+	}
+	return true;
+}
+
+
 //int main() {
-//	SearchTree tree = NULL;
-//	tree = CreateSearchTree(tree);
-//	PreOrderTraversal(tree);
-//	cout << endl;
-//	InOrderTraversal(tree);
-//	cout << endl;
-//	int preorder[] = {1};
-//	int inorder[] = {1};
-//	Position root = ConstructBiTree(preorder, inorder, sizeof(preorder) / sizeof(int));
-//	PreOrderTraversal(root);
-//	cout << endl;
-//	InOrderTraversalRecursion(root);
-//    cout << endl;
+
+	/*SearchTree tree = NULL;
+	tree = CreateSearchTree(tree);
+	PreOrderTraversal(tree);
+	cout << endl;
+	InOrderTraversal(tree);
+	cout << endl;
+	cout << "max: " << FindMax(tree)->element << " " << FindMax2(tree)->element << endl;
+	cout << "min: " << FindMin(tree)->element << " " << FindMin2(tree)->element << endl;*/
+	/*int preorder[] = {1};
+	int inorder[] = {2};
+	Position root = ConstructBiTree(preorder, inorder, sizeof(preorder) / sizeof(int));
+	PreOrderTraversal(root);
+	cout << endl;
+	InOrderTraversalRecursion(root);
+	cout << endl;*/
+
+	////二叉树A和B，判断A和B是否相等
+	////二叉树A和B，判断B是不是A的子结构
+	//SearchTree treea = NULL;
+	//int a[] = {1, 2, 3, 4, 5};
+	//for (int i = 0; i < sizeof(a) / sizeof(int); ++i)
+	//	treea = InsertToTree(a[i], treea);
+
+	//int b[] = { 2, 3, 1};
+	//SearchTree treeb = NULL;
+	//for (int i = 0; i < sizeof(b) / sizeof(int); ++i)
+	//	treeb = InsertToTree(b[i], treeb);
+	////if (EqualBinaryTree(treea, treeb))
+	////	cout << "yes" << endl;
+	////else
+	////	cout << "no" << endl;
+	//if (IsSubTree(treea, treeb))
+	//	cout << "yes" << endl;
+	//else
+	//	cout << "no" << endl;
+
+	////打印二叉树中和为某一值的路径
+	//SearchTree tree = NULL;
+	//tree = CreateSearchTree(tree);
+	//int sum = 5;
+	//FindPath(tree, sum);
+
+	/*SearchTree tree = NULL;
+	tree = CreateSearchTree(tree);
+	cout << GetMaxDistance(tree) << endl;*/
+
+	/*SearchTree tree = NULL;
+	tree = CreateSearchTree(tree);
+	cout << GetMaxDistance(tree) << " " << GetMaxDistance2(tree) << endl;
+	IsBalancedTree2(tree);
+	if (IsBalancedTree(tree))
+	cout << "balance" << endl;
+	else
+	cout << "no" << endl;*/
+	
+	//int a[] = {1,2,4,7,3,5,6,8};
+	//int b[] = {4,7,2,1,5,3,8,6};
+	////PrintPostOrder(a, b, sizeof(a) / sizeof(int));
+	////int a[] = {1, 2};int b[] = {2,1};
+	//SearchTree tree = ConstructBiTree(a, b, sizeof(a) / sizeof(int));
+	//cout << endl;
+	//PreOrderTraversal(tree);
+	//cout << endl;
+	//PostOrderTraversal(tree);
+	//cout << endl;
+
 //}
-//
+
