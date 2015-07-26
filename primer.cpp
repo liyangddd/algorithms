@@ -8,6 +8,35 @@
 #include <functional>
 using namespace std;
 
+//istream_iterator从标准输入读入一系列整数。
+//ostream_iterator将其中的奇数写入一个文件并在每个写入数字后加一个空格，
+//将偶数读入另外一个文件，每个数字存一行
+int main() {
+	ofstream odd_file("odd_file.txt");
+	ofstream even_file("even_file.txt");
+	if (!odd_file || !even_file) {
+		cerr << "Can not open output file!" << endl;
+		return EXIT_FAILURE;
+	}
+
+	cout << "Please input some integers: " << endl;
+	istream_iterator<int> in_iter(cin), eof;
+	ostream_iterator<int> out_odd_iter(odd_file, " ");
+	ostream_iterator<int> out_even_iter(even_file, "\n");
+
+	while (in_iter != eof) {
+		if (*in_iter % 2 != 0)
+			*out_odd_iter++ = *in_iter;
+		else
+			*out_even_iter++ = *in_iter;
+		++in_iter;
+	}
+
+	odd_file.close();
+	even_file.close();
+
+	return 0;
+}
 
 class A {
 public:
