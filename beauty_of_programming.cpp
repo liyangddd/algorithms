@@ -121,6 +121,91 @@ int main() {
 //每次计算出的要一次性的保存下去。另外需要注意，对于0每次单独处理，即10+0,100+0的情况。
 
 
+//2.10寻找数组中最大值和最小值
+//两次遍历数组分别找最大、最小值需要比较2n次
+//如下的方法需要比较1.5次：将相邻的两个元素比较；然后，
+//将较大的和max比较，更新max；将较小的和min比较，更新min
+void FindMaxAndMin (int& max, int& min, vector<int>& vec) {
+	if (vec.size() == 0) {  //数组为空
+		cout << "empty ";
+		return;
+	}
+	if (vec.size() == 1) {  //数组仅有一个元素
+		max = min = vec[0];
+		return;
+	}
+
+	if (vec[0] > vec[1]) {
+		max = vec[0];
+		min = vec[1];
+	}
+	else {
+		max = vec[1];
+		min = vec[0];
+	}
+	if (vec.size() == 2)  //数组仅有两个元素
+		return;
+
+	int i;
+	for (i = 3; i < vec.size(); i += 2) {
+		if (vec[i] > vec[i - 1]) {
+			if (vec[i] > max)
+				max = vec[i];
+			if (vec[i - 1] < min)
+				min = vec[i - 1];
+		}
+		else {
+			if (vec[i - 1] > max)
+				max = vec[i - 1];
+			if (vec[i] < min)
+				min = vec[i];
+		}
+	}
+	
+	//当数组的元素个数为奇数时，最后一个元素要进行比较
+	if (i == vec.size()) {
+		if (vec[i - 1] > max)
+			max = vec[i - 1];
+		if (vec[i - 1] < min)
+			min = vec[i - 1];
+	}
+}
+
+int main() {
+	int max;// = 0x80000000;
+	int min;// = 0x7fffffff;
+
+	vector<int> vec1;
+	FindMaxAndMin(max, min, vec1);
+	cout << max << " " << min << endl;
+
+	int a2[] = {1};
+	vector<int> vec2(a2, a2 + sizeof(a2) / sizeof(int));
+	FindMaxAndMin(max, min, vec2);
+	cout << max << " " << min << endl;
+
+	int a3[] = {1,2};
+	vector<int> vec3(a3, a3 + sizeof(a3) / sizeof(int));
+	FindMaxAndMin(max, min, vec3);
+	cout << max << " " << min << endl;
+
+	int a4[] = {1,2,3,4};
+	vector<int> vec4(a4, a4 + sizeof(a4) / sizeof(int));
+	FindMaxAndMin(max, min, vec4);
+	cout << max << " " << min << endl;
+
+	int a5[] = {551,52,3,4, -12};
+	vector<int> vec5(a5, a5 + sizeof(a5) / sizeof(int));
+	FindMaxAndMin(max, min, vec5);
+	cout << max << " " << min << endl;
+
+	int a6[] = {1,1,1,1};
+	vector<int> vec6(a6, a6 + sizeof(a6) / sizeof(int));
+	FindMaxAndMin(max, min, vec6);
+	cout << max << " " << min << endl;
+}
+
+
 //例2.13子数组的最大乘积
 int MaxMutiplication(int a[], int length) {
 	int *array1 = new int[length];
