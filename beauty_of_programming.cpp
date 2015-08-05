@@ -211,12 +211,12 @@ int MaxMutiplication(int a[], int length) {
 	int *array1 = new int[length];
 	int *array2 = new int[length];
 
-	//求解数组正向时的前i项和，存储在array1[i]中
+	//求解数组正向时的前i项积，存储在array1[i - 1]中
 	array1[0] = a[0];
 	for (int i = 1; i < length; ++i)
 		array1[i] = array1[i- 1] * a[i];
 
-	//求解数组逆向时的后length - i项和，存储在array2[i]中
+	//求解数组逆向时的后length - i项积，存储在array2[i]中
 	array2[length - 1] = a[length - 1];
 	for (int i = length - 2; i >= 0; --i)
 		array2[i] = array2[i + 1] * a[i];
@@ -224,10 +224,12 @@ int MaxMutiplication(int a[], int length) {
 	//初始化结果为：数组除了第一个元素外的n-1个元素的乘积
 	int max_result = array2[1];  
 	for (int i = 1; i < length - 1; ++i) {
+		//array1[i - 1] * array2[i + 1]结果就是数组中除了下标为i的数，其他n-1个数的乘积
 		if (max_result < (array1[i - 1] * array2[i + 1]))
 			max_result = array1[i - 1] * array2[i + 1];
 	}
 
+        //将max_result与“除了最后一项的其他n-1项的乘积”比较
 	if (max_result < array1[length - 1])
 		max_result = array1[length - 1];
 	return max_result;
