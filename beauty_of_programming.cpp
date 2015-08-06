@@ -343,3 +343,64 @@ int main() {
 	cout << MaxMutiplication(a, sizeof(a) / sizeof(int)) << endl;
 }
 
+
+//2.16求数组中最长递增子序列 
+//http://blog.csdn.net/u013074465/article/details/45442067
+//方法一：O(n^ 2)
+int LIS(vector<int>& vec) {
+	vector<int> longest(vec.size(), 1);
+	for (int i = 1; i < vec.size(); ++i) {
+		for (int j = 0; j < i; ++j) {
+			if (vec[j] < vec[i] && longest[i] < longest[j] + 1)
+				longest[i] = longest[j] + 1; 
+		}
+	}
+
+	int max = longest[0];
+	for (int i = 0; i < longest.size(); ++i) {
+		if (max < longest[i])
+			max = longest[i];
+	}
+	return max;
+}
+
+/*方法二：O(nlogn)
+本解法的具体操作如下：
+建立一个辅助数组array，依次读取数组元素 x 与数组末尾元素 top比较： 
+如果 x > top，将 x 放到数组末尾；
+如果 x < top，则二分查找数组中第一个 大于等于x 的数，并用 x 替换它。
+遍历结束之后，最长递增序列长度即为栈的大小。
+
+注意c数组的下标代表的是子序列的长度，c数组中的值也是按递增顺序排列的。这才可能用二分查找。
+
+数组array[i]存储的是子序列长度为i的序列最后一个值（该值是该子序列中最大的元素；
+如果长度为i的序列有多个，那么array[i]存放这类序列最后元素中的最小一个）
+*/
+int LIS2(vector<int>& vec) {
+	vector<int> temp;
+	for (int i = 0; i < vec.size(); ++i) {
+		if (temp.empty() || temp.back() < vec[i])
+			temp.push_back(vec[i]);
+		else {
+			int begin = 0, end = temp.size() - 1;
+			while (begin < end) {
+				int mid = (begin + end) / 2;
+				if (temp[mid] < vec[i])
+					begin = mid + 1;
+				else
+					end = mid - 1;
+			}
+			temp[begin] = vec[i];
+		}
+	}
+	return temp.size();
+}
+
+int main() {
+	int a[] = {1,-1,2,-3,4,-5,6,-7};
+	int a2[] = { 3,5,7,1,2,8};
+	vector<int> vec1(a, a + sizeof(a) / sizeof(int));
+	vector<int> vec2(a2, a2 + sizeof(a2) / sizeof(int));
+	cout << LIS(vec1) << " " << LIS(vec2) << endl;
+	cout << LIS2(vec1) << " " << LIS2(vec2) << endl;
+}
