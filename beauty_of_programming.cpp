@@ -2,6 +2,7 @@
 《编程之美》代码
 */
 
+/********************************2.8************************************/
 //2.8 找符合条件的整数
 //给定n，寻找一个最小的整数m，使得m * n的十进制表示中只有0和1
 //参考：http://blog.csdn.net/jcwKyl/article/details/3859155
@@ -121,6 +122,7 @@ int main() {
 //每次计算出的要一次性的保存下去。另外需要注意，对于0每次单独处理，即10+0,100+0的情况。
 
 
+/********************************2.10************************************/
 //2.10寻找数组中最大值和最小值
 //两次遍历数组分别找最大、最小值需要比较2n次
 //如下的方法需要比较1.5次：将相邻的两个元素比较；然后，
@@ -206,6 +208,107 @@ int main() {
 }
 
 
+/********************************2.12************************************/
+//2.12快速寻找满足条件的两个数
+//在数组中找出两个数，使得这两个数的和等于给定的值，
+//假设数组中肯定存在符合要求的一对数
+
+//方法一：穷举法。查找任意两个数，看其之和是否为给定数
+//该方法时间复杂度为O(n^2)
+
+//方法二：对数组排序，然后对数组中每个数进行二分查找
+//时间复杂度O(nlogn),找出所有的符合要求点对
+int binary_search1(vector<int>& vec, int first, int last, int value, int pos) {
+	if (first > last)
+		return -1;
+	int mid = (first + last) / 2;
+	
+	//当在数组中找到了一个value而且该value不是vec[i]时才是符合要求的
+	//例如数组{1,2,3,4}中sum为2的是不存在的，也就是(1,1)不符合要求
+	if (vec[mid] == value && mid != pos)
+		return mid;
+	else if (value < vec[mid])
+		binary_search1(vec, first, mid - 1, value, pos);
+	else
+		binary_search1(vec, mid + 1, last, value, pos);
+	return -1;
+}
+
+int binary_search2(vector<int>& vec, int value, int pos) {
+	int length = vec.size();
+	int first = 0, last = length - 1, mid;
+	while (first < last) {
+		mid = (first + last) / 2;
+		if (vec[mid] == value && mid != pos)
+			return mid;
+		else if (vec[mid] < value)
+			first = mid + 1;
+		else
+			last = mid - 1;
+	}
+	return -1;
+}
+void FindTwoElements2(vector<int> &vec, int sum) {
+	sort(vec.begin(), vec.end());
+	int value;
+	bool found = false;
+	for (int i = 0; i < vec.size(); ++i) {
+		value = sum - vec[i];
+		int found_pos = -1;
+		/*if ((found_pos = binary_search1(vec, 0, vec.size(), value, i)) != -1)
+		cout << "found: " << vec[found_pos] << " " << vec[i] << endl;*/
+		if ((found_pos = binary_search2(vec, value, i)) != -1) {
+			cout << "found: " << vec[found_pos] << " " << vec[i] << endl;
+			found = true;
+		}
+	}
+	if (!found)
+		cout << "not found" << endl;
+}
+
+//方法三：对数组排序，然后两个指针分别从数组首尾进行遍历
+//该方法找到一对符合要求的就返回
+//对数组排序时间为O(nlogn),但是两个指针遍历仅需要O(n)
+void FindTwoElements3(vector<int> &vec, int sum) {
+	sort(vec.begin(), vec.end());
+	int begin = 0, end = vec.size() - 1;
+	while (begin < end) {
+		if (vec[begin] + vec[end] == sum) {
+			cout << "found: " << vec[begin] << " " << vec[end] << endl;
+			return;
+		}
+		else if (vec[begin] + vec[end] > sum)
+			--end;
+		else
+			++begin;
+	}
+	cout << "not found" << endl;
+	return;
+}
+
+//2.12拓展：找出三个数之和
+//遍历每个数组元素，对每个vec[i]调用上面的求两个数之和
+//的方法：FindTwoElements2(vec, sum - vec[i]);
+void FindThreeElements(vector<int>& vec, int sum) {
+	for (int i = 0; i < vec.size() / 2; ++i) {
+		cout << vec[i] << " ";
+		FindTwoElements2(vec, sum - vec[i]);
+	}
+}
+int main() {
+	int a[] = {1,2,3,4,5,6,7,8};
+	vector<int> vec(a, a + sizeof(a) / sizeof(int));
+	int value;
+	while (cin >> value) {
+		//FindTwoElements2(vec, value);
+		//FindTwoElements3(vec, value);
+		FindThreeElements(vec, value);
+	}
+}
+
+
+
+/********************************2.13************************************/
 //例2.13子数组的最大乘积
 int MaxMutiplication(int a[], int length) {
 	int *array1 = new int[length];
