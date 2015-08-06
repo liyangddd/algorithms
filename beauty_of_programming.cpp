@@ -404,3 +404,34 @@ int main() {
 	cout << LIS(vec1) << " " << LIS(vec2) << endl;
 	cout << LIS2(vec1) << " " << LIS2(vec2) << endl;
 }
+
+
+
+//2.17数组循环位移
+//将“I am a student”翻转为“student a am I”此题方法类似
+void reverse(char *str, int begin, int end) {
+	for ( ; begin < end; ++begin, --end) {
+		char temp = str[begin];
+		str[begin] = str[end];
+		str[end] = temp;
+	}
+	return;
+}
+
+void RightShiftK(char *str, int length, int k) {
+	if (NULL == str || k == 0)
+		return;
+	if (k < 0)
+		k = length + k;
+	k = k % length;
+
+	reverse(str, 0, length - k - 1);
+	reverse(str, length - k, length - 1);
+	reverse(str, 0, length - 1);
+}
+
+int main() {
+	char str[] = "123abcd";
+	RightShiftK(str, strlen(str), -2);
+	cout << str << endl;
+}
