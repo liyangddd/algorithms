@@ -439,6 +439,7 @@ int main() {
 
 /********************************2.19************************************/
 //2.19区间重合判断
+//http://blog.csdn.net/linyunzju/article/details/7737060
 //该函数用于sort函数中，比较两个区间大小，以便对区间排序
 //排序复杂度O(nlogn)
 bool Compare(pair<int, int>& p1, pair<int, int>& p2) {
