@@ -344,6 +344,7 @@ int main() {
 }
 
 
+/********************************2.16************************************/
 //2.16求数组中最长递增子序列 
 //http://blog.csdn.net/u013074465/article/details/45442067
 //方法一：O(n^ 2)
@@ -406,7 +407,7 @@ int main() {
 }
 
 
-
+/********************************2.17************************************/
 //2.17数组循环位移
 //将“I am a student”翻转为“student a am I”此题方法类似
 void reverse(char *str, int begin, int end) {
@@ -434,4 +435,75 @@ int main() {
 	char str[] = "123abcd";
 	RightShiftK(str, strlen(str), -2);
 	cout << str << endl;
+}
+
+/********************************2.19************************************/
+//2.19区间重合判断
+//该函数用于sort函数中，比较两个区间大小，以便对区间排序
+//排序复杂度O(nlogn)
+bool Compare(pair<int, int>& p1, pair<int, int>& p2) {
+	if (p1.first < p2.first)
+		return true;
+	else if (p1.first == p2.first && p1.second < p2.second)
+		return true;
+	return false;
+}
+
+//在合并后的区间内二分查找，如果待查找区间在合并后某区间内，那么即符合要求，
+//函数返回true，否则返回false
+//vec的前n个容器存储合并后的区间，section存储待查找的区间
+//查找复杂度O(logn)
+bool BinarySearch(vector<pair<int, int> >& vec, int n, pair<int, int>& section) {
+	int left = 0, right = n - 1, mid;
+	while (left <= right) {
+		mid = (left + right) / 2;
+		if (section.first < vec[mid].first)
+			right = mid - 1;
+		else if (section.second > vec[mid].second)
+			left = mid + 1;
+		else if (section.first >= vec[mid].first && section.second <= vec[mid].second)
+			return true;
+	}
+	return false;
+}
+
+//对vec内的区间排序，然后二分查找，找到true，否则false
+//合并后的区段一共有count个，存储在vec的前count个元素中
+bool MatchSection(vector<pair<int, int> > &vec, pair<int, int>& section) {
+	sort(vec.begin(), vec.end(), Compare);  
+
+	int section_end = vec[0].second;
+	int count = 0;       //记录合并后区间的下标
+	for (int i = 1; i < vec.size(); ++i) {
+		if (section_end >= vec[i].first)
+			section_end = vec[i].second;
+		else {
+			vec[count++].second = section_end;
+			vec[count].first = vec[i].first;
+			section_end = vec[i].second;
+		}
+	}
+	vec[count++].second = section_end;
+
+	cout << "输入合并区间后的vector的内容，验证：" << endl;
+	vector<pair<int, int> >::iterator iter = vec.begin();
+	while (iter != vec.end()) {
+		cout << (*iter).first << " " << (*iter).second << endl;
+		++iter;
+	}
+	return BinarySearch(vec, count, section);
+} 
+
+int main() {
+	vector<pair<int,int> > vec;
+	vec.push_back(make_pair(2,3));
+	vec.push_back(make_pair(1,2));
+	vec.push_back(make_pair(4,9));
+
+	if (MatchSection(vec, make_pair(1, 6)))
+		cout << "ok" << endl;
+	else
+		cout << "no" << endl;
+
+	return 0;
 }
