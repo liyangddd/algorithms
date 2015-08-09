@@ -135,3 +135,100 @@ void PrintNodeByLevel2(Tree* tree) {
 	}
 	return;
 }
+
+
+
+//3.11 程序改错（二分查找）
+//找出一个有序字符串arr中值等于字符v的元素的序号，
+//如果多个元素符合要求，返回序号最大的
+//方法一：坏的复杂度为O(n)
+int SearchMaxIndex(char *arr, int n, char ch) {
+	int left = 0, right = n - 1, mid;
+	while (left <= right) {
+		mid = left + (right - left) / 2;
+		if (arr[mid] == ch) //利用二分查找找到一个ch后退出本层循环
+			break;
+		else if (arr[mid] < ch)
+			left = mid + 1;
+		else
+			right = mid - 1;
+	}
+
+	//如果上层的循环找到了一个ch的话，本层循环线性查找
+	//等于ch的、编号最大的那个ch
+	//当arr元素中有一半以上的元素等于ch，复杂度为O(n)
+	if (left <= right) {
+		while (arr[mid] == ch)
+			++mid;
+		return mid - 1;
+	}
+	return -1;
+}
+
+//方法二：复杂度为O(logn)
+int SearchMaxIndex2(char *arr, int n, char ch) {
+	int left = 0, right = n - 1, mid;
+	while (left < right - 1) {
+		mid = left + (right - left) / 2;
+		//cout << left << " " << right << " " << mid << endl;
+		if (arr[mid] <= ch)
+			left = mid;
+		else
+			right = mid - 1;
+	}
+
+	if (arr[right] == ch)
+		return right;
+	else if (arr[left] == ch)
+		return left;
+	else
+		return -1;
+}
+
+//找出一个有序字符串arr中值等于字符v的元素的序号，
+//如果多个元素符合要求，返回序号最小的
+int SearchMaxIndex3(char *arr, int n, char ch) {
+	int left = 0, right = n - 1, mid;
+	while (left < right - 1) {
+		mid = left + (right - left) / 2;
+		if (arr[mid] >= ch)
+			right = mid;
+		else
+			left = mid + 1;
+	}
+
+	if (arr[left] == ch)
+		return left;
+	else if (arr[right] == ch)
+		return right;
+	else
+		return -1;
+}
+
+//给定一个有序数组arr，求最小的i使得arr[i]大于v，不存在则返回-1
+int SearchMaxIndex4(char *arr, int n, char ch) {
+	int left = 0, right = n - 1, mid;
+	while (left < right - 1) {
+		mid = left + (right - left) / 2;
+		if (arr[mid] <= ch)
+			left = mid + 1;
+		else
+			right = mid;
+	}
+	if (arr[left] > ch)
+		return left;
+	else if (arr[right] > ch)
+		return right;
+	else
+		return -1;
+}
+
+int main() {
+	char arr[] = "ac";
+	char ch = 'c';
+	int pos = SearchMaxIndex4(arr, sizeof(arr) / sizeof(char), ch);
+	if (pos == -1)
+		cout << "not found" << endl;
+	else
+		cout << arr[pos] << " " << pos << endl;
+}
