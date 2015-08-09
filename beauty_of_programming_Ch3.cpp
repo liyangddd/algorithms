@@ -76,3 +76,62 @@ int main() {
 	else
 		cout << "no" << endl;
 }
+
+
+//3.10 分层遍历二叉树
+//每行输出一层节点的各个元素
+//方法一：
+//利用vector充当队列，两个指针current和last分别指向vector
+//中某层树元素的第一个和最后一个，当current < last时，依次遍历
+//本层每个元素
+typedef struct Tree{
+	Tree* left;
+	Tree* right;
+	int value; 
+} Tree, Node;
+void PrintNodeByLevel(Tree* tree) {
+	if (tree == NULL)
+		return;
+	vector<Node*> vec;
+	int current = 0, last = 1;
+	vec.push_back(tree);
+	while (current < vec.size()) {
+		last = vec.size();
+		while (current < last) {
+			cout << vec[current] -> value << " ";
+			if (vec[current]->left)
+				vec.push_back(vec[current]->left);
+			if (vec[current]->right)
+				vec.push_back(vec[current]->right);
+			++current;
+		}
+		cout << endl;
+	}
+}
+
+//方法二：
+//http://www.cnblogs.com/miloyip/archive/2010/05/12/binary_tree_traversal.html
+//每层遍历结束，在队列中插入一个空指针，标志本层结束需要输出换行
+void PrintNodeByLevel2(Tree* tree) {
+	if (tree == NULL)
+		return;
+
+	queue<Node *> q;
+	q.push(tree);
+	while (!q.empty()) {
+		Node * node = q.front();
+		q.pop();
+		if (node) {
+			cout << node->value << " ";
+			if (node->left)
+				q.push(node->left);
+			if (node->right)
+				q.push(node->right);
+		}
+		else if (!q.empty()) {
+			q.push(NULL);
+			cout << endl;
+		}
+	}
+	return;
+}
