@@ -287,14 +287,46 @@ void FindTwoElements3(vector<int> &vec, int sum) {
 }
 
 //2.12拓展：找出三个数之和
+//方法一：
 //遍历每个数组元素，对每个vec[i]调用上面的求两个数之和
 //的方法：FindTwoElements2(vec, sum - vec[i]);
+//该方法允许一个元素被找多次，例如main函数中：1,1,2符合sum等于4的要求
 void FindThreeElements(vector<int>& vec, int sum) {
 	for (int i = 0; i < vec.size() / 2; ++i) {
 		cout << vec[i] << " ";
 		FindTwoElements2(vec, sum - vec[i]);
 	}
 }
+
+//方法二：
+//不允许一个元素找多次，找到一组符合要求的就返回
+void FindThreeElements2(vector<int>& vec, int sum) {
+	int subsum;
+	bool found = false;
+	//如果数组无序先对数组排序
+	//sort(vec.begin(), vec.end()); 
+
+	for (int k = 0; k < vec.size(); ++k) {
+		subsum = sum - vec[k];
+		int begin = 0, end = vec.size() - 1;
+		while (begin < end) {
+			if (begin == k)  ++begin;
+			if (end == k)  --end;
+			if (vec[begin] + vec[end] == subsum) {
+				cout << vec[k] << " " << vec[begin] << " " << vec[end] << endl;
+				++begin;
+				--end;
+				return;
+			}
+			else if (vec[begin] + vec[end] < subsum)
+				++begin;
+			else
+				--end;
+		}
+	}
+	cout << "not found" << endl;
+}
+
 int main() {
 	int a[] = {1,2,3,4,5,6,7,8};
 	vector<int> vec(a, a + sizeof(a) / sizeof(int));
