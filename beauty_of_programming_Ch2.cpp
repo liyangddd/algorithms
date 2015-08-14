@@ -392,14 +392,75 @@ int FindThreeClosest(vector<int>& vec, int target) {
 }
 
 
+////2.12拓展二：找出一个数组中和等于target的四个数
+//有多个时，打印所有的情况
+vector<vector<int> > FindFourElements(vector<int>& vec, int target) {
+	vector<vector<int> > result;
+	sort(vec.begin(), vec.end());
+
+	for (int a = 0; a < vec.size() - 3; ++a) {
+		for (int b = a + 1; b < vec.size() - 2; ++b) {
+			int c = b + 1;
+			int d = vec.size() - 1;
+			while (c < d) {
+				if (vec[a] + vec[b] + vec[c] + vec[d] < target)
+					++c;
+				else if (vec[a] + vec[b] + vec[c] + vec[d] > target)
+					--d;
+				else {
+					vector<int> temp;
+					temp.push_back(vec[a]);
+					temp.push_back(vec[b]);
+					temp.push_back(vec[c]);
+					temp.push_back(vec[d]);
+					result.push_back(temp);
+					++c;
+					--d;
+				}
+			}
+		}
+	}
+	//去除结果集合中重复的
+	sort(result.begin(), result.end());
+	result.erase(unique(result.begin(), result.end()), result.end());
+	return result;
+}
+
 int main() {
-	int a[] = {1,2,3,4,5,6,7,8};
+	int a[] = {1,2,3,4,5,6,7,8,9,10,11};
 	vector<int> vec(a, a + sizeof(a) / sizeof(int));
 	int value;
 	while (cin >> value) {
 		//FindTwoElements2(vec, value);
 		//FindTwoElements3(vec, value);
-		FindThreeElements(vec, value);
+		//FindThreeElements2(vec, value);
+
+		//vector<vector<int> > result = FindThreeElements3(vec, value);
+		//if (result.size() == 0)
+		//	cout << "not found" << endl;
+		//vector<vector<int> >::iterator iter = result.begin();
+		//while (iter != result.end()) {
+		//	vector<int>::iterator iter_in = (*iter).begin();
+		//	while (iter_in != (*iter).end())
+		//		cout << *iter_in++ << " ";
+		//	cout << endl;
+		//	++iter;
+		//}
+
+		//int result = FindThreeClosest(vec, value);
+		//cout << result << endl;
+
+		vector<vector<int> > result = FindFourElements(vec, value);
+		if (result.size() == 0)
+			cout << "not found" << endl;
+		vector<vector<int> >::iterator iter = result.begin();
+		while (iter != result.end()) {
+			vector<int>::iterator iter_in = (*iter).begin();
+			while (iter_in != (*iter).end())
+				cout << *iter_in++ << " ";
+			cout << endl;
+			++iter;
+		}
 	}
 }
 
