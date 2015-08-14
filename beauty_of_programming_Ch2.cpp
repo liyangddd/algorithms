@@ -392,10 +392,16 @@ int FindThreeClosest(vector<int>& vec, int target) {
 }
 
 
-////2.12拓展二：找出一个数组中和等于target的四个数
-//有多个时，打印所有的情况
+////2.12拓展三：找出一个数组中和等于target的四个数
+//有多个时符合要求的情况，打印所有的情况
+//方法一：
+//先排序，然后前后指针，时间O(n^3)
+void PrintFourElementsResult(vector<vector<int> >& result);
 vector<vector<int> > FindFourElements(vector<int>& vec, int target) {
 	vector<vector<int> > result;
+	if (vec.size() < 4) //元素个数小于四个直接返回空
+		return result;
+
 	sort(vec.begin(), vec.end());
 
 	for (int a = 0; a < vec.size() - 3; ++a) {
@@ -426,6 +432,118 @@ vector<vector<int> > FindFourElements(vector<int>& vec, int target) {
 	return result;
 }
 
+////2.12拓展三：找出一个数组中和等于target的四个数
+//有多个时情况时，打印所有的情况
+//方法二：使用map
+//先排序，然后将两个数的和缓存
+//时间复杂度平均O(n^ 2),最坏O(n ^ 4);空间O(n^2)
+vector<vector<int> > FindFourElements2(vector<int>& vec, int target) {
+	vector<vector<int> > result;
+	if (vec.size() < 4)
+		return result;
+	sort(vec.begin(), vec.end());
+
+	//map用于缓存两个数的和，键：两数的和；值：这两个数的下标
+	map<int, vector<pair<int, int> > > cache;
+	for (int a = 0; a < vec.size(); ++a) {
+		for (int b = a + 1; b < vec.size(); ++b)
+			cache[vec[a] + vec[b]].push_back(make_pair(a, b));
+	}
+
+	for (int c = 0; c < vec.size(); ++c) {
+		for (int d = c + 1; d < vec.size(); ++d) {
+			int key = target - vec[c] - vec[d];
+
+			//如果当前的两个数之和与cache中两数之和的和不符合要求，继续
+			if (cache.find(key) == cache.end())
+				continue;
+
+			vector<pair<int, int> > temp_vec = cache[key];
+			for (int k = 0; k < temp_vec.size(); ++k) {
+				if (c <= temp_vec[k].second)
+					continue;  //有重叠
+				vector<int> temp;
+				temp.push_back(vec[temp_vec[k].first]);
+				temp.push_back(vec[temp_vec[k].second]);
+				temp.push_back(vec[c]);
+				temp.push_back(vec[d]);
+				result.push_back(temp);
+			}
+		}
+	}
+	
+	//去除结果集中重复的
+	sort(result.begin(), result.end());
+	result.erase(unique(result.begin(), result.end()), result.end());
+	return result;
+}
+
+////2.12拓展三：找出一个数组中和等于target的四个数
+//有多个时，打印所有的情况
+//方法三：使用multimap
+//先排序，然后将两个数的和缓存
+//时间复杂度平均O(n^ 2);空间O(n^2)
+//该函数用于输出四个数时的结果
+vector<vector<int> > FindFourElements3(vector<int>& vec, int target) {
+	vector<vector<int> > result;
+	if (vec.size() < 4)
+		return result;
+	sort(vec.begin(), vec.end());
+
+	//multimap存放两个数和，以及两个数的下标
+	multimap<int, pair<int, int> > cache;
+	for (int a = 0; a < vec.size() - 1; ++a) {
+		for (int b = a + 1; b < vec.size(); ++b)
+			cache.insert(make_pair(vec[a] + vec[b], make_pair(a, b)));
+	}
+
+	//取出cache中两个和，如果这两个和的和等于target，而且组成这两对和
+	//的四个数互不相同（它们的下标不同），则这四个数就是符合的一个解
+	multimap<int, pair<int, int> >::iterator iter;
+	for (iter = cache.begin(); iter != cache.end(); ++iter) {
+		int subsum = target - iter->first; 
+		typedef multimap<int, pair<int,int> >::iterator mul_iter;
+
+		//从cache中找到符合subsum + iter->first等于target的四个数
+		pair<mul_iter, mul_iter> range = cache.equal_range(subsum);
+
+		mul_iter iter_in;
+		for (iter_in = range.first; iter_in != range.second; ++iter_in) {
+			int a = iter->second.first;
+			int b = iter->second.second;
+			int c = iter_in->second.first;
+			int d = iter_in->second.second;
+			if (a != c && a != d && b != c && b != d) {
+				vector<int> temp;
+				temp.push_back(vec[a]);
+				temp.push_back(vec[b]);
+				temp.push_back(vec[c]);
+				temp.push_back(vec[d]);
+				//注意这里先将符合要求的四个数排序，以便下边删除重复的
+				sort(temp.begin(), temp.end());
+				result.push_back(temp);
+			}
+		}
+	}
+	sort(result.begin(), result.end());
+	result.erase(unique(result.begin(), result.end()), result.end());
+	return result;
+}
+
+//该函数用于输出满足条件的四个数的结果集合
+void PrintFourElementsResult(vector<vector<int> >& result) {
+	if (result.size() == 0)
+		cout << "not found" << endl;
+	vector<vector<int> >::iterator iter = result.begin();
+	while (iter != result.end()) {
+		vector<int>::iterator iter_in = (*iter).begin();
+		while (iter_in != (*iter).end())
+			cout << *iter_in++ << " ";
+		cout << endl;
+		++iter;
+	}
+}
+
 int main() {
 	int a[] = {1,2,3,4,5,6,7,8,9,10,11};
 	vector<int> vec(a, a + sizeof(a) / sizeof(int));
@@ -436,33 +554,25 @@ int main() {
 		//FindThreeElements2(vec, value);
 
 		//vector<vector<int> > result = FindThreeElements3(vec, value);
-		//if (result.size() == 0)
-		//	cout << "not found" << endl;
-		//vector<vector<int> >::iterator iter = result.begin();
-		//while (iter != result.end()) {
-		//	vector<int>::iterator iter_in = (*iter).begin();
-		//	while (iter_in != (*iter).end())
-		//		cout << *iter_in++ << " ";
-		//	cout << endl;
-		//	++iter;
-		//}
+		//PrintFourElementsResult(result);
 
 		//int result = FindThreeClosest(vec, value);
 		//cout << result << endl;
 
-		vector<vector<int> > result = FindFourElements(vec, value);
-		if (result.size() == 0)
-			cout << "not found" << endl;
-		vector<vector<int> >::iterator iter = result.begin();
-		while (iter != result.end()) {
-			vector<int>::iterator iter_in = (*iter).begin();
-			while (iter_in != (*iter).end())
-				cout << *iter_in++ << " ";
-			cout << endl;
-			++iter;
-		}
+		//vector<vector<int> > result1 = FindFourElements(vec, value);
+		//PrintFourElementsResult(result1);
+		//cout << endl;
+
+		vector<vector<int> > result = FindFourElements2(vec, value);
+		PrintFourElementsResult(result);
+		cout << endl;
+
+		vector<vector<int> > result2 = FindFourElements3(vec, value);
+		PrintFourElementsResult(result2);
+		cout << endl;
 	}
 }
+
 
 
 
