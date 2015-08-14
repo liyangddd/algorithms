@@ -304,7 +304,7 @@ void FindThreeElements2(vector<int>& vec, int sum) {
 	int subsum;
 	bool found = false;
 	//如果数组无序先对数组排序
-	//sort(vec.begin(), vec.end()); 
+	sort(vec.begin(), vec.end()); 
 
 	for (int k = 0; k < vec.size(); ++k) {
 		subsum = sum - vec[k];
@@ -332,6 +332,8 @@ void FindThreeElements2(vector<int>& vec, int sum) {
 //如果数据没有排序要先排序！！！
 vector<vector<int> > FindThreeElements3(vector<int>& vec, int sum) {
 	vector<vector<int> > result;
+	sort(vec.begin(), vec.end());
+	
 	for (int a = 0; a < vec.size() - 2; ++a) {
 		int b = a + 1, c = vec.size() - 1;
 		while (b < c) {
@@ -363,7 +365,8 @@ int FindThreeClosest(vector<int>& vec, int target) {
 	int result;  //记录最终的sum，即最接近target的三数和
 	int min_gap = INT_MAX;  //记录target与sum的最小差值
 	vector<int> result_elements(3, 0); //记录最终的三个数
-
+	sort(vec.begin(), vec.end());
+	
 	for (int a = 0; a < vec.size() - 2; ++a) {
 		int b = a + 1, c = vec.size() - 1;
 		while (b < c) {
