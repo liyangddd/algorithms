@@ -352,6 +352,8 @@ vector<vector<int> > FindThreeElements3(vector<int>& vec, int sum) {
 			}
 		}
 	}
+	
+	//去除结果集合中重复的
 	sort(result.begin(), result.end());
 	result.erase(unique(result.begin(), result.end()), result.end());
 	return result;
