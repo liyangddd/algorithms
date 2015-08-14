@@ -327,6 +327,66 @@ void FindThreeElements2(vector<int>& vec, int sum) {
 	cout << "not found" << endl;
 }
 
+//方法三：找出所有符合的三个数
+//上面方法二是将三个数的转化为两个数的情况，这里直接遍历
+//如果数据没有排序要先排序！！！
+vector<vector<int> > FindThreeElements3(vector<int>& vec, int sum) {
+	vector<vector<int> > result;
+	for (int a = 0; a < vec.size() - 2; ++a) {
+		int b = a + 1, c = vec.size() - 1;
+		while (b < c) {
+			if (vec[a] + vec[b] + vec[c] < sum)
+				++b;
+			else if (vec[a] + vec[b] + vec[c] > sum)
+				--c;
+			else {
+				vector<int> temp;
+				temp.push_back(vec[a]);
+				temp.push_back(vec[b]);
+				temp.push_back(vec[c]);
+				result.push_back(temp);
+				++b;
+				--c;
+			}
+		}
+	}
+	sort(result.begin(), result.end());
+	result.erase(unique(result.begin(), result.end()), result.end());
+	return result;
+}
+
+//2.12拓展二：找出一个数组中最接近一个给定target的三个数
+//上面的拓展中，一定存在a+b+c等于sum，这里要求的是最接近的
+//函数返回最接近target的sum值
+//如果数据没有排序要先排序！！！
+int FindThreeClosest(vector<int>& vec, int target) {
+	int result;  //记录最终的sum，即最接近target的三数和
+	int min_gap = INT_MAX;  //记录target与sum的最小差值
+	vector<int> result_elements(3, 0); //记录最终的三个数
+
+	for (int a = 0; a < vec.size() - 2; ++a) {
+		int b = a + 1, c = vec.size() - 1;
+		while (b < c) {
+			int sum = vec[a] + vec[b] + vec[c];
+			int gap = abs(sum - target);
+			if (gap < min_gap) {
+				result = sum;
+				//更新三个数
+				result_elements[0] = vec[a];
+				result_elements[1] = vec[b];
+				result_elements[2] = vec[c];
+				min_gap = gap;
+			}
+			if (sum < target)  ++b;
+			else   --c;
+		}
+	}
+	cout << result_elements[0] << " " << result_elements[1] << " " 
+		<< result_elements[2] << " sum: ";
+	return result;
+}
+
+
 int main() {
 	int a[] = {1,2,3,4,5,6,7,8};
 	vector<int> vec(a, a + sizeof(a) / sizeof(int));
