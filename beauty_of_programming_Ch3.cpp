@@ -68,10 +68,50 @@ bool StrStrShift2(char *str, char *substr) {
 	return false;
 }
 
+//方法三：对方法二的改进
+//方法二代码冗余度太大，这里的方法没有
+//参考：http://blog.chinaunix.net/uid-20630773-id-3211899.html
+
+//该函数是库函数strncmp的实现，可以直接用库函数strncmp
+int Strncmp(char *str, char *substr, size_t count) {
+	if (str == NULL || substr == NULL)
+		return false;
+
+	int result = 0;
+	while (count-- && !(result = *str - *substr) && *str) {
+		++str;
+		++substr;
+	}
+	return result;
+}
+
+bool StrStrShift3(char *str, char *substr) {
+	if (str == NULL || substr == NULL)
+		return false;
+
+	int len_str = strlen(str);
+	int len_substr = strlen(substr);
+	if (len_substr > len_str * 2)
+		return false;
+
+	for (int i = 0; i < len_str; ++i) {
+		//如果str剩下的字符长度大于substr的长度，可不用循环，直接一次比较完成
+		if (len_str >= i + len_substr) {
+			if (Strncmp(str + i, substr, len_substr) == 0)
+				return true;
+		}
+		else { //否则，还需要将substr的后半部分与str的开始部分接着匹配
+			if ((Strncmp(str + i, substr, len_str - i) == 0) && 
+				(Strncmp(str, substr + len_str - i, len_substr - len_str + i) == 0))
+				return true;
+		}
+	}
+	return false;
+}
 int main() {
 	char str[] = "1234";
 	char substr[] = "41";
-	if (StrStrShift2(str, substr))
+	if (StrStrShift3(str, substr))
 		cout << "ok" << endl;
 	else
 		cout << "no" << endl;
