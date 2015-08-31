@@ -198,22 +198,13 @@ void *memchr1(void *str, int value, size_t count) {
 	return NULL;
 }
 
-//查找字符串s中首次出现字符c的位置     
-char *strchr1(char *str, int c)     {     
-	assert(str != NULL);     
-	for (; *str != (char)c; ++ str)     
-		if (*str == '\0')     
-			return NULL;     
-	return str;     
-}   
-
-//对原 strtok 的修改，根据MSDN,strToken可以为NULL.实际上第一次call strtok给定一字串，    
-//再call strtok时可以输入NULL代表要接着处理给定字串。    
-//所以需要用一 static 保存没有处理完的字串。同时也需要处理多个分隔符在一起的情况。    
-char *strtok(char *strToken, const char *str) {    
+//strtok：
+//static char *last保存没有处理完的字串。    
+char *strtok1(char *strToken, const char *str) {    
 	assert(str != NULL);    
 	static char *last;    
 
+	//如果strToken等于NULL并且last记录的部分也为NULL证明处理完，返回NULL
 	if (strToken == NULL && (strToken = last) == NULL)    
 		return (NULL);    
 
@@ -223,7 +214,8 @@ char *strtok(char *strToken, const char *str) {
 		t = str;    
 		while (*t != '\0') {    
 			if (*s == *t) {    
-				last = s + 1;    
+				last = s + 1; 
+				//跳过str中的字符，继续向strTok后匹配
 				if (s - strToken == 0) {    
 					strToken = last;    
 					break;    
@@ -231,12 +223,28 @@ char *strtok(char *strToken, const char *str) {
 				*(strToken + (s - strToken)) = '\0';    
 				return strToken;    
 			}    
-			++ t;    
+			++t;    
 		}    
-		++ s;    
+		++s;    
 	}    
 	return NULL;    
-}    
+}   
+
+//strtok1函数调用方式：
+//第一次调用strtok函数设置两个参数，第一次分割的结果
+//，返回串中第一个','之前的字符串“abc”；
+//第二次调用strtok第一个参数设置为NULL，返回分割后面串
+//的结果：123，第三次返回ddd。
+int main() {
+	char str[] = "abc,  123,   ddd,   ";
+	char *p = strtok1(str, ", ");  //第一次调用
+	while (p) {
+		cout << p << endl;
+		p = strtok1(NULL, ", ");  //之后的调用
+	}
+}
+
+
 //int main() {
 //	int data = 33;
 //	int *aa = &data;
