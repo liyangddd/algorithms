@@ -199,7 +199,8 @@ void *memchr1(void *str, int value, size_t count) {
 }
 
 //strtok：
-//static char *last保存没有处理完的字串。    
+//static char *last保存没有处理完的字串。   
+//strToken为待分割的字符串，str为用于分割的字符组
 char *strtok1(char *strToken, const char *str) {    
 	assert(str != NULL);    
 	static char *last;    
@@ -215,7 +216,7 @@ char *strtok1(char *strToken, const char *str) {
 		while (*t != '\0') {    
 			if (*s == *t) {    
 				last = s + 1; 
-				//跳过str中的字符，继续向strTok后匹配
+				//跳过strToken中的分割字符，继续向strTok后匹配
 				if (s - strToken == 0) {    
 					strToken = last;    
 					break;    
