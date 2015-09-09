@@ -5,6 +5,257 @@
 #include <vector>
 using namespace std;
 
+//T49
+int myAtoi(char *str) {
+	assert(str != NULL && *str != '\0');
+
+	int flag = 1;
+	if (*str == '-') {
+		flag = -1;
+		++str;
+	}
+	else if (*str == '+') {
+		flag = 1;
+		++str;
+	}
+
+	//如果输入仅为'-'或'+'，为非法输入
+	if (*str == '\0') {
+		perror("error input");
+		return 0;
+	}
+
+	long long result = 0;
+	while (*str != '\0') {
+		if (*str > '9' || *str < '0') {
+			perror("error input");
+			return (int)result;
+		}
+		result = result * 10 + flag * (*str - '0');
+
+		//如果转换结果大于最大的正数2147483647，返回这个最大值
+		//如果转换结果小于最小的整数-2147483648，返回这个最小值
+		if (flag == 1 && result > 0x7fffffff)
+			return 0x7fffffff;
+		else if (flag == -1 && result < (signed int)0x80000000)
+			return (int)0x80000000;
+
+		++str;
+	}
+	return (int)result;
+}
+
+//int main() {
+//	char str1[] = "-21474836499";
+//	cout << myAtoi(str1) << endl;
+//	cout << atoi(str1) << endl;
+//}
+
+//P250:StrToInt(atoi)
+bool flag = false;
+int StrToInt(char *str) {
+	int minus = false;
+	long long result = 0;
+	if (str != NULL && *str != '\0') {
+		if (*str == '-') {
+			minus = true;
+			++str;
+		}
+		else if (*str == '+')
+			++str;
+
+		if (*str != '\0') //判断字符串仅为一个“-”或“+”的情况
+		{  
+			while (*str != '\0') 
+			{
+				if (*str >= '0' && *str <= '9') 
+				{
+					int minus_flag = minus ? -1 : 1;
+					//result = result * 10 + minus_flag * (*str - '0');
+					result = result * 10 + minus_flag * (*str - '0');
+					if ((!minus && result > 0x7FFFFFFF) ||
+						(minus && result < (signed int)0x80000000)) {
+							result = 0;
+							break;
+					}
+					++str;
+				}
+				else {
+					result = 0;
+					break;
+				}
+			}
+			if (*str == '\0')
+				flag = true;
+		}
+	}
+	return (int)result;
+}
+
+class Solution {
+public:
+	int atoi(const char *str) {
+		int num = 0;
+		int sign = 1;
+		const int n = strlen(str);
+		int i = 0;
+		while (str[i] == ' ' && i < n) i++;
+		if (str[i] == '+') {
+			i++;
+		} else if (str[i] == '-') {
+			sign = -1;
+			i++;
+		}
+		for (; i < n; i++) {
+			if (str[i] < '0' || str[i] > '9')
+				break;
+			if (num > INT_MAX / 10 ||
+				(num == INT_MAX / 10 &&
+				(str[i] - '0') > INT_MAX % 10)) {
+					return sign == -1 ? INT_MIN : INT_MAX;
+			}
+			num = num * 10 + str[i] - '0';
+		}
+		return num * sign;
+	}
+};
+////32位系统最大正整数：2147483647(2^31 - 1)
+//int main() {
+//	string str;
+//	char test[20] = {'\0'};
+//	while (true) {
+//		cin >> str;
+//		sprintf(test, str.c_str());
+//		Solution sl;
+//		cout << sl.atoi(test) << endl;
+//		cout << StrToInt(test) << endl << endl;
+//	}
+//}
+
+//T7
+//两个栈模拟队列
+template<typename T>
+class MyQueue {
+private:
+	stack<int> stack_a, stack_b;
+public:
+	void EnQueue(const T& value);
+	T DeQueue();
+};
+
+template<typename T>
+void MyQueue<T>::EnQueue(const T& value) {
+	stack_a.push(value);
+}
+
+template<typename T>
+T MyQueue<T>::DeQueue() {
+	if (stack_b.size() == 0) {
+		while (stack_a.size() > 0) {
+			stack_b.push(stack_a.top());
+			stack_a.pop();
+		}
+	}
+
+	if (stack_b.size() == 0)
+		throw new exception("queue is empty");
+	T temp = stack_b.top();
+	stack_b.pop();
+	return temp;
+}
+
+//两个队列模拟栈
+template<typename T>
+class MyStack {
+private:
+	queue<int> queue_a, queue_b;
+public:
+	void push(const T& value);
+	void pop();
+	T top();
+};
+
+template<typename T>
+void MyStack<T>::push(const T& value) {
+	if (queue_a.empty() && queue_b.empty())
+		queue_a.push(value);
+	else if (!queue_b.empty())
+		queue_b.push(value);
+	else if (!queue_a.empty())
+		queue_a.push(value);
+}
+
+template<typename T>
+void MyStack<T>::pop() {
+	if (!queue_a.empty()) {
+		while (queue_a.size() > 1) {
+			queue_b.push(queue_a.front());
+			queue_a.pop();
+		}
+		queue_a.pop();
+	}
+	else if (!queue_b.empty()) {
+		while (queue_b.size() > 1) {
+			queue_a.push(queue_b.front());
+			queue_b.pop();
+		}
+		queue_b.pop();
+	}
+	else
+		throw new exception("stack is empty.");
+}
+
+template<typename T>
+T MyStack<T>::top() {
+	T temp;
+	if (!queue_a.empty()) {
+		while (queue_a.size() > 1) {
+			queue_b.push(queue_a.front());
+			queue_a.pop();
+		}
+		temp = queue_a.front();
+		queue_b.push(temp);
+		queue_a.pop();
+	}
+	else if (!queue_b.empty()) {
+		while (queue_b.size() > 1) {
+			queue_a.push(queue_b.front());
+			queue_b.pop();
+		}
+		temp = queue_b.front();
+		queue_a.push(temp);
+		queue_b.pop();
+	}
+	else
+		throw new exception("stack is empty");
+	return temp;
+}
+//int main() {
+//	MyStack<int> s;
+//	s.push(1);
+//	s.push(2);
+//	s.push(3);
+//	cout << s.top() << endl;
+//	s.pop();
+//	cout << s.top() << endl;
+//	s.push(5);
+//	cout << s.top() << endl;
+//	/*MyQueue<int> q;
+//	q.EnQueue(1);
+//	q.EnQueue(2);
+//	q.EnQueue(3);
+//	q.EnQueue(4);
+//	cout << q.DeQueue() << endl;
+//	cout << q.DeQueue() << endl;
+//	cout << q.DeQueue() << endl;
+//	q.EnQueue(7);
+//	q.EnQueue(9);
+//	cout << q.DeQueue() << endl;
+//	cout << q.DeQueue() << endl;*/
+//}
+
+
+
 int GreatestSumOfSubarrays2(int *array, int length) {
 	int sum = array[0];
 	int maxsum = array[0];
@@ -199,86 +450,10 @@ char* myitoa(int value, char* result, int base) {
 //}
 
 //////////////////////////////////////////////////////////////////
-//P250:StrToInt(atoi)
-bool flag = false;
-int StrToInt(char *str) {
-	int minus = false;
-	long long result = 0;
-	if (str != NULL && *str != '\0') {
-		if (*str == '-') {
-			minus = true;
-			++str;
-		}
-		else if (*str == '+')
-			++str;
 
-		if (*str != '\0') //判断字符串仅为一个“-”或“+”的情况
-		{  
-			while (*str != '\0') 
-			{
-				if (*str >= '0' && *str <= '9') 
-				{
-					int minus_flag = minus ? -1 : 1;
-					//result = result * 10 + minus_flag * (*str - '0');
-					result = result * 10 + minus_flag * (*str - '0');
-					if ((!minus && result > 0x7FFFFFFF) ||
-						(minus && result < (signed int)0x80000000)) {
-							result = 0;
-							break;
-					}
-					++str;
-				}
-				else {
-					result = 0;
-					break;
-				}
-			}
-			if (*str == '\0')
-				flag = true;
-		}
-	}
-	return (int)result;
-}
 
-class Solution {
-public:
-	int atoi(const char *str) {
-		int num = 0;
-		int sign = 1;
-		const int n = strlen(str);
-		int i = 0;
-		while (str[i] == ' ' && i < n) i++;
-		if (str[i] == '+') {
-			i++;
-		} else if (str[i] == '-') {
-			sign = -1;
-			i++;
-		}
-		for (; i < n; i++) {
-			if (str[i] < '0' || str[i] > '9')
-				break;
-			if (num > INT_MAX / 10 ||
-				(num == INT_MAX / 10 &&
-				(str[i] - '0') > INT_MAX % 10)) {
-					return sign == -1 ? INT_MIN : INT_MAX;
-			}
-			num = num * 10 + str[i] - '0';
-		}
-		return num * sign;
-	}
-};
-////32位系统最大正整数：2147483647(2^31 - 1)
-//int main() {
-//	string str;
-//	char test[20] = {'\0'};
-//	while (true) {
-//		cin >> str;
-//		sprintf(test, str.c_str());
-//		Solution sl;
-//		cout << sl.atoi(test) << endl;
-//		cout << StrToInt(test) << endl << endl;
-//	}
-//}
+
+
 //T8
 int Min(int *numbers, int length) {
 	if (numbers == NULL || length <= 0)
@@ -458,3 +633,37 @@ int main() {
 	cout << test << endl;
 }
 */
+
+
+//T3
+//rows：数组的行数，columns：数组的列数
+bool IsInArray(int *array, int rows, int columns, int number) {
+	bool found = false;
+	if (array == NULL || rows < 1 || columns < 1)
+		return found;
+	
+	int row = 0, column = columns - 1;
+	while (row < rows && columns >= 0) {
+		if (array[row * columns + column] == number) {
+			found = true;
+			break;
+		}
+		else if (array[row * columns + column] > number)
+			--column;
+		else
+			++row;
+	}
+	return found;
+}
+
+//int main() {
+//	int array[][3] = {{1,2,3},{2,3,4},{4,5,6}};
+//	int number;
+//	while (cin >> number) {
+//		if (IsInArray((int *)array, 3, 3, number))
+//			cout << "found" << endl;
+//		else
+//			cout << "not found" << endl;
+//	}
+//	
+//}
