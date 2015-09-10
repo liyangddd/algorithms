@@ -133,7 +133,84 @@ public:
 //}
 
 
-/*********************************T11*****************************/
+
+/***************T11数值的整数次方*************/
+//方法一：
+bool Equal(double a, double b) {
+	if ((a - b) > -0.000001 && (a - b) < 0.000001)
+		return true;
+	else
+		return false;
+} 
+
+double MyPower1(double base, int exponent) {
+	if (Equal(base, 0.0)) {
+		if (exponent == 0)
+			return 1.0;
+		else
+			return 0.0;
+	}
+
+	int abs_exponent;
+	if (exponent < 0)
+		abs_exponent = -exponent;
+	else
+		abs_exponent = exponent;
+
+	double result = 1.0;
+	for (int i = 0; i < abs_exponent; ++i) {
+		result *= base;
+	}
+
+	if (exponent < 0)
+		return 1.0 / result;
+	return result;
+}
+
+//方法二：
+double MyPower2Core(double base, int exponent) {
+	if (exponent == 0)
+		return 1.0;
+	else if (exponent == 1)
+		return base;
+
+	double result = MyPower2Core(base, exponent >> 1);
+	result *= result;
+
+	if (exponent & 0x1 == 1)
+		result *= base;
+
+	return result;
+}
+double MyPower2(double base, int exponent) {
+	if (Equal(base, 0.0)) {
+		if (exponent == 0)
+			return 1.0;
+		else
+			return 0.0;
+	}
+
+	int abs_exponent;
+	if (exponent < 0)
+		abs_exponent = -exponent;
+	else
+		abs_exponent = exponent;
+
+	double result = MyPower2Core(base, abs_exponent);
+	if (exponent < 0)
+		return 1.0 / result;
+	return result;
+}
+int main() {
+	double base;
+	int exponent;
+	while (cin >> base >> exponent) {
+		cout << MyPower1(base, exponent) << " " << MyPower2(base,exponent) << endl;
+	}
+}
+
+
+/*********************************T10*****************************/
 //二进制表示中1的个数
 int NumberOf1(int n) {
 	unsigned int flag = 1;
@@ -154,6 +231,7 @@ int NumberOf2(int n) {
 	}
 	return count;
 }
+
 
 
 /**********************************************T7****************************/
