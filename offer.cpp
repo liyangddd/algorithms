@@ -5,7 +5,7 @@
 #include <vector>
 using namespace std;
 
-//T49
+/******************************************T49****************************/
 int myAtoi(char *str) {
 	assert(str != NULL && *str != '\0');
 
@@ -132,7 +132,31 @@ public:
 //	}
 //}
 
-//T7
+
+/*********************************T11*****************************/
+//二进制表示中1的个数
+int NumberOf1(int n) {
+	unsigned int flag = 1;
+	int count = 0;
+	while (flag) {
+		if (flag & n)
+			++count;
+		flag = flag << 1;
+	}
+	return count;
+}
+
+int NumberOf2(int n) {
+	int count = 0;
+	while (n) {
+		++count;
+		n = n & (n - 1);
+	}
+	return count;
+}
+
+
+/**********************************************T7****************************/
 //两个栈模拟队列
 template<typename T>
 class MyQueue {
