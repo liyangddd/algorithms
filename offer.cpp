@@ -133,6 +133,53 @@ public:
 //}
 
 
+/************T24判断某序列是否为二叉排序树的后续序列******/
+bool IsPostOrder(int list[], int length) {
+	if (list == NULL || length < 1)
+		return false;
+	if (length < 3)
+		return true;
+
+	int root = list[length - 1];
+	int left_end = 0;   
+	while (list[left_end] < root) {
+		if (left_end >= length - 1)
+			break;
+		++left_end;
+	}
+
+	int right_start = left_end + 1;
+	int right_index = right_start;
+	while (right_index < length - 1) {
+		if (list[right_index] < root)
+			return false;
+		++right_index;
+	}
+
+	bool left = false;
+	if (left_end > 0)
+		left = IsPostOrder(list, left_end);
+
+	bool right = false;
+	if (left_end < length - 1)
+		right = IsPostOrder(list + left_end, length - left_end - 1);
+
+	return (left && right);
+}
+
+int main() {
+	int n;
+	cin >> n;
+	int *list = new int[n];
+	for (int i = 0; i < n; ++i)
+		cin >> list[i];
+	if (IsPostOrder(list, n))
+		cout << "OK" << endl;
+	else
+		cout << "NO" << endl;
+	delete []list;
+}
+
 
 /**********T22判断是否为出栈序列****************/
 bool IsPopOrder(int *pushlist, int *poplist, int length) {
