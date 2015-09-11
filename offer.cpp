@@ -133,6 +133,45 @@ public:
 //}
 
 
+
+/**********T22判断是否为出栈序列****************/
+bool IsPopOrder(int *pushlist, int *poplist, int length) {
+	if (pushlist == NULL || poplist ==NULL || length < 1)
+		return false;
+
+	stack<int> stacka;  //存进栈序列
+	stack<int> stackb; //存出栈序列
+	int indexa = 0, indexb = 0;
+	bool flag = false;
+	while (indexb < length) {
+		while ((stacka.empty() || stacka.top() != poplist[indexb]))	{
+			if (indexa == length)
+				break;
+			stacka.push(pushlist[indexa]);
+			++indexa;
+		}
+
+		if (stacka.top() != poplist[indexb])
+			break;
+		stacka.pop();
+		++indexb;
+	}
+
+	if (stacka.empty() && indexb == length)
+		return true;
+	return false;
+}
+
+int main() {
+	int pushlist[] = {1,2,3,4,5};
+	int poplist[] = {4,5,3,2,1};
+	if (IsPopOrder(pushlist, poplist, sizeof(pushlist) / sizeof(int)))
+		cout << "OK" << endl;
+	else
+		cout << "NO" << endl;
+}
+
+
 /************T20顺时针打印矩阵**************/
 void PrintMatrixClockwiselyCore(int **numbers, int rows, int columns, int start) {
 	int endx = columns - 1 - start;
