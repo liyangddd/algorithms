@@ -133,6 +133,33 @@ public:
 //}
 
 
+/****************T14调整数组使奇数位于偶数之前**********/
+void AdjustArray(int numbers[], int length) {
+	if (numbers == NULL || length < 2)
+		return;
+
+	int begin = 0, end = length - 1;
+	while (begin < end) {
+		while (begin < end && (numbers[begin] & 0x1) == 1)
+			++begin;
+		while (begin < end && (numbers[end] & 0x1) == 0)
+			--end;
+		int temp = numbers[begin];
+		numbers[begin] = numbers[end];
+		numbers[end] = temp;
+	}
+
+}
+
+int main() {
+	int a[] = {1,3,5,2,4,6,8};
+	AdjustArray(a, sizeof(a) / sizeof(int));
+	for (int i = 0; i < sizeof(a) / sizeof(int); ++i)
+		cout << a[i] << " ";
+	cout << endl;
+}
+
+
 
 /***************T11数值的整数次方*************/
 //方法一：
