@@ -133,6 +133,57 @@ public:
 //}
 
 
+/************T20顺时针打印矩阵**************/
+void PrintMatrixClockwiselyCore(int **numbers, int rows, int columns, int start) {
+	int endx = columns - 1 - start;
+	int endy = rows - 1 - start;
+
+	for (int i = start; i <= endx; ++i)
+		cout << numbers[start][i] << " ";
+
+	if (start < endy) {
+		for (int i = start + 1; i <= endy; ++i)
+			cout << numbers[i][endx] << " ";
+	}
+
+	if (start < endx && start < endy) {
+		for (int i = endx - 1; i >= start; --i)
+			cout << numbers[endy][i] << " ";
+	}
+
+	if (start < endx && start < endy - 1) {
+		for (int i = endy - 1; i > start; --i)
+			cout << numbers[i][start] << " ";
+	}
+}
+void PrintMatrixClockwisely(int **numbers, int rows, int columns) {
+	if (numbers == NULL || rows <= 0 || columns <= 0)
+		return;
+	int start = 0;
+	while (2 * start < columns && 2 * start < rows) {
+		PrintMatrixClockwiselyCore(numbers, rows, columns, start);
+		++start;
+	}
+}
+
+int main() {
+	int rows, columns;
+	cin >> rows >> columns;
+	int **p = new int*[rows];
+	for (int i = 0; i < rows; ++i) {
+		p[i] = new int[columns];
+		for (int j = 0; j < columns; ++j)
+			p[i][j] = i * columns + j + 1;
+	}
+
+	PrintMatrixClockwisely(p, rows, columns);
+	for (int i = 0; i < rows; ++i)
+		delete []p[i];
+	delete []p;
+}
+
+
+
 /****************T14调整数组使奇数位于偶数之前**********/
 void AdjustArray(int numbers[], int length) {
 	if (numbers == NULL || length < 2)
